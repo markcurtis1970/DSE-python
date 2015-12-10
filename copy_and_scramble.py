@@ -16,7 +16,7 @@ if len(sys.argv) != 7:
     print "\n***",sys.argv[0], "***\n"
     print 'Incorrect number of arguments, please run script as follows:'
     print '\n'+str(sys.argv[0])+' <ip address> <source_keyspace> <source_table> <target_keyspace> <target_table> <key query>'
-    print 'Note: to surround the key with quotes and escape any special characters; e.g. "\"firstName\"='Joe' AND \"secondName\"='Smith'" 
+    print 'Note: to surround the key with quotes and escape any special characters; e.g. "\"firstName\"=\'Joe\' AND \"secondName\"=\'Smith\'\"' 
     sys.exit(0)
 
 # Initialise variables
