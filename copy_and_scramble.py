@@ -12,10 +12,11 @@ from random import shuffle
 
 # Check arguments
 # (note the count of arugments includes arg 0 which is this script!)
-if len(sys.argv) != 6:
+if len(sys.argv) != 7:
     print "\n***",sys.argv[0], "***\n"
     print 'Incorrect number of arguments, please run script as follows:'
-    print '\n'+str(sys.argv[0])+' <ip address> <source_keyspace> <source_table> <target_keyspace> <target_table>'
+    print '\n'+str(sys.argv[0])+' <ip address> <source_keyspace> <source_table> <target_keyspace> <target_table> <key query>'
+    print 'Note: to surround the key with quotes and escape any special characters; e.g. "\"firstName\"='Joe' AND \"secondName\"='Smith'" 
     sys.exit(0)
 
 # Initialise variables
@@ -24,6 +25,7 @@ src_keyspace = sys.argv[2]
 src_table =  sys.argv[3]
 tgt_keyspace = sys.argv[4]
 tgt_table = sys.argv[5]
+tgt_key = sys.argv[6]
 
 
 # Scramble the data
@@ -74,7 +76,8 @@ session = cluster.connect()
 # this will form the basis of what we write into
 # the target table
 # NOTE: you will probably want to remove the limit statement
-cql = SimpleStatement('select * from ' + src_keyspace + '.' + src_table + ' LIMIT 100;', fetch_size=1000)
+cql = SimpleStatement('select * from ' + src_keyspace + '.' + src_table + ' WHERE ' + tgt_key + ';', fetch_size=1000)
+print cql
 results = session.execute(cql)
 
 # Create the prepared statement
