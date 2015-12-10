@@ -2,6 +2,7 @@
 import sys
 import os
 import logging
+import hashlib
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.query import SimpleStatement
@@ -24,12 +25,19 @@ src_table =  sys.argv[3]
 tgt_keyspace = sys.argv[4]
 tgt_table = sys.argv[5]
 
+
 # Scramble the data
 # just a basic example
 def scramble(word):
    word = list(word)
    shuffle(word)
    return ''.join(word)
+
+# Scramble the data
+# using a hashing function
+def scramble_hash(word):
+    hash_object = hashlib.md5(word)
+    return hash_object.hexdigest()
 
 # Create a prepared statement from any set of results
 def createPrepStatement(source_data):
@@ -51,7 +59,7 @@ def write_copy(source_data, prep_statement):
         sc_field_list = [ ]
         for field in row._fields:
             if isinstance(getattr(row, field), (str, unicode)):
-                scrambled_field = scramble(str(getattr(row, field)))
+                scrambled_field = scramble_hash(str(getattr(row, field)))
             else:
                 scrambled_field = getattr(row, field)
             sc_field_list.append(scrambled_field) # See note2
