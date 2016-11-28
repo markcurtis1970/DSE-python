@@ -1,5 +1,3 @@
-# For testing logged batches
-
 from cassandra.cluster import Cluster
 from cassandra.query import BatchStatement
 from cassandra.query import BatchType
@@ -34,9 +32,10 @@ print '\nlooping through ' + str(loop) + ' iterations'
 # set batch statments
 for idx in range(1, loop):
     val = str(idx)
+    timest = now()
     batch = BatchStatement(batch_type=BatchType.LOGGED)
-    batch.add(SimpleStatement("insert into tablea (col1, col2, col3) VALUES (%s, %s, %s)"), (now(), val, val))
-    batch.add(SimpleStatement("insert into tableb (col1, col2, col3) VALUES (%s, %s, %s)"), (now(), val, val))
+    batch.add(SimpleStatement("insert into tablea (col1, col2, col3) VALUES (%s, %s, %s)"), (timest, val, val))
+    batch.add(SimpleStatement("insert into tableb (col1, col2, col3) VALUES (%s, %s, %s)"), (timest, val, val))
     session.execute(batch)
 
 print '\ninserts all done...'
@@ -47,12 +46,13 @@ print '\nchecking values across tables...'
 # select rows from tablea
 rowsa = session.execute('SELECT col1, col2, col3 FROM tablea')
 
-# check all rows in one table against the other
+# check all rows in one table against the other 
 for rowa in rowsa:
     rowsb = session.execute('SELECT col1, col2, col3 FROM tableb WHERE col1=\'' + rowa.col1 + '\';')
     for rowb in rowsb:
         # ideally we should only have the one row so we'll
         # do one compare and then break
+        print 'checking key values: ' + str(rowa.col1), str(rowb.col1) + '         \r',
         if (rowa != rowb):
             print 'row mismatch! '+ str(rowa) + ' vs ' + str(rowb)
         break
